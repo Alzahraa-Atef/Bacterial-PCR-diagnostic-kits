@@ -1,0 +1,36 @@
+#!/bin/bash
+
+# Install the `acedb-other` package, which may provide bioinformatics tools or libraries.
+sudo apt install -y acedb-other
+
+# Install the NCBI Entrez Direct utilities for accessing NCBI databases.
+sudo apt install -y ncbi-entrez-direct
+
+# Download and install the Entrez Direct utility using a script hosted by NCBI.
+sh -c "$(wget -qO- ftp://ftp.ncbi.nlm.nih.gov/entrez/entrezdirect/install-edirect.sh)"
+
+# Fetch nucleotide sequences in FASTA format using NCBI's Entrez Direct `efetch` tool.
+# The sequences are saved to a file named 'all_MSA.fastaN'.
+efetch -db nucleotide -format fasta -id NZ_JBAGJA010000001.1,NC_000908.2,NZ_CP159789.1,NC_018496.1,NC_018495.1,CP003772.1,CP003773.1,NZ_CP145106.1,NZ_JBAGIZ010000003.1,NZ_CP145105.1,NZ_AAGX01000019.1 > all_MSA.fastaN
+
+# Extract the headers (lines starting with ">") from the fetched FASTA file to verify the sequences.
+grep ">" all_MSA.fastaN
+
+# Combine multiple FASTA files into a single file for further analysis.
+# Note: Ensure the file names '1.fatsa', '2.fasta', ..., '11.fasta' exist in the current directory.
+cat 1.fatsa 2.fasta 3.fasta 4.fasta 5.fasta 6.fasta 7.fasta 8.fasta 9.fasta 10.fasta 11.fasta > combined_file
+
+# Perform multiple sequence alignment using Clustal Omega.
+# The input is the combined file, and the output alignment is saved in Clustal format.
+clustalo -i combined_file -o output.aln --outfmt=clustal --force
+
+# Generate a guide tree file from the sequence alignment using Clustal Omega.
+clustalo -i combined_file -o output.aln --guidetree-out=tree.dnd --force
+
+# Run Primer3 to design primers based on the input file 'conserved.txt'.
+# The output is saved in 'primer3_output.txt'.
+primer3_core < conserved.txt > primer3_output.txt
+
+
+
+
